@@ -8,6 +8,8 @@ module Examine
 
   module CLI
     class Clair < Thor
+
+      method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
       desc 'start', 'start a clair server'
       def start
         db_pid = spawn 'docker run -d --name clair-db arminc/clair-db:latest'
@@ -19,6 +21,7 @@ module Examine
 
         command = 'docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT'
         print '.' until system(command)
+        print '.' until system("curl -s #{options[:clair_url]}/v1/namespaces > /dev/null")
         puts "clair-local-scan started. (PID: #{clair_pid})"
       end
 
