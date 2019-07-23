@@ -1,28 +1,22 @@
 # Examine
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/examine`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This gem is used to perform different types of analysis on your
+code/images.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'examine'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Install it yourself as:
 
     $ gem install examine
 
 ## Usage
 
-TODO: Write usage instructions here
+To scan a docker image: (this requires docker to be running on your system)
+
+```bash
+$ examine clair scan mokhan/minbox:latest
+$ examine clair scan node:latest
+```
 
 ## Development
 
@@ -32,7 +26,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/examine.
+Bug reports and pull requests are welcome on GitLab at https://gitlab.com/xlgmokha/examine.
 
 ## License
 
