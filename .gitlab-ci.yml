@@ -23,7 +23,4 @@ rspec:
   image: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
   stage: test
   script:
-    - apk add git
-    - gem install bundler -v '~> 2.0'
-    - bundle install
     - bundle exec rspec
