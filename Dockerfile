@@ -1,7 +1,6 @@
-FROM ruby:alpine
-
-RUN apk add git
-RUN gem install bundler -v '~> 2.0'
+FROM docker:stable
+RUN apk add ruby git
+RUN gem install bundler -v '~> 2.0' --no-document
 RUN mkdir -p /examine
 WORKDIR /examine
 COPY . .
