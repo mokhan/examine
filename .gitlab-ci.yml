@@ -20,5 +20,6 @@ rspec:
   image: ruby:alpine
   stage: test
   script:
+    - gem install bundler -v '~> 2.0'
     - bundle install
     - bundle exec rspec
