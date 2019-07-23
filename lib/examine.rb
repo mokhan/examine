@@ -15,8 +15,15 @@ module Examine
         command = 'docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT'
         print '.' until system(command)
 
-        clair_pid = spawn 'docker run --restart=unless-stopped -p 6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:latest'
+        clair_pid = spawn 'docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:latest'
         puts "clair-local-scan started. (PID: #{clair_pid})"
+      end
+
+      desc 'scan <image>', 'scan a specific image'
+      def scan(image)
+        system "docker pull #{image}"
+        system "echo clair-scanner -c http://localhost:6060 --ip $(hostname -i) #{image}"
+        system "clair-scanner -c http://localhost:6060 --ip 0.0.0.0 #{image}"
       end
 
       desc 'status', 'status of clair server'
