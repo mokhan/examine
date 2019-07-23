@@ -21,12 +21,12 @@ module Examine
       end
 
       method_option :ip, desc: 'ip address', default: nil, type: :string
+      method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
       desc 'scan <image>', 'scan a specific image'
       def scan(image)
         ip = options[:ip] || Socket.ip_address_list[1].ip_address
         system "docker pull #{image}"
-        system "echo clair-scanner -c http://localhost:6060 --ip $(hostname -i) #{image}"
-        system "clair-scanner -c http://localhost:6060 --ip #{ip} #{image}"
+        system "clair-scanner -c #{options[:clair_url]} --ip #{ip} #{image}"
       end
 
       desc 'status', 'status of clair server'
