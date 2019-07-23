@@ -5,6 +5,9 @@ stages:
   - build
   - test
 
+include:
+  - template: Container-Scanning.gitlab-ci.yml
+
 build:
   image: docker:stable
   stage: build
