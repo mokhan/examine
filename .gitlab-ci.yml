@@ -12,5 +12,5 @@ build:
   script:
     - docker info
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $IMAGE
+    - docker build -t $IMAGE .
     - docker push $IMAGE
