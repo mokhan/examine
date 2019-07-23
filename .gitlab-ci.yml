@@ -20,7 +20,9 @@ build:
     - docker push $IMAGE
 
 rspec:
-  image: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+  image:
+    name: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+    entrypoint: [""]
   stage: test
   script:
     - bundle exec rspec
