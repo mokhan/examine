@@ -11,12 +11,14 @@ module Examine
       desc 'start', 'start a clair server'
       def start
         db_pid = spawn 'docker run -d --name clair-db arminc/clair-db:latest'
-        puts "clair-db started. (PID: #{db_pid})"
-
         command = 'docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT'
         print '.' until system(command)
+        puts "clair-db started. (PID: #{db_pid})"
 
         clair_pid = spawn 'docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:latest'
+
+        command = 'docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT'
+        print '.' until system(command)
         puts "clair-local-scan started. (PID: #{clair_pid})"
       end
 
@@ -24,6 +26,8 @@ module Examine
       method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
       desc 'scan <image>', 'scan a specific image'
       def scan(image)
+        start unless started?
+
         ip = options[:ip] || Socket.ip_address_list[1].ip_address
         system "docker pull #{image}"
         system "clair-scanner -c #{options[:clair_url]} --ip #{ip} #{image}"
@@ -38,6 +42,12 @@ module Examine
       def stop
         system "docker stop $(docker ps | grep -v CONT | grep clair- | awk '{ print $1 }')"
         system "docker system prune -f"
+      end
+
+      private
+
+      def started?
+        status
       end
     end
 
