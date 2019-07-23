@@ -23,6 +23,8 @@ rspec:
   image:
     name: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
     entrypoint: [""]
+  variables:
+    GIT_STRATEGY: none
   stage: test
   script:
     - bundle exec rspec
@@ -30,7 +32,8 @@ rspec:
 examine:
   image:
     name: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
-    entrypoint: [""]
+  variables:
+    GIT_STRATEGY: none
   stage: test
   script:
-    - bundle exec ./examine clair scan mokhan/minbox:latest
+    - clair scan mokhan/minbox:latest
