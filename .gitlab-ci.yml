@@ -30,6 +30,7 @@ rspec:
 examine:
   image:
     name: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+    entrypoint: [""]
   stage: test
   script:
-    - clair scan mokhan/minbox:latest
+    - bundle exec ./examine clair scan mokhan/minbox:latest
