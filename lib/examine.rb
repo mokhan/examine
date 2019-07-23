@@ -33,6 +33,7 @@ module Examine
 
         ip = options[:ip] || Socket.ip_address_list[1].ip_address
         system "docker pull #{image}"
+        # TODO:: ensure that the clair-scanner is found in PATH
         system "clair-scanner -c #{options[:clair_url]} --ip #{ip} #{image}"
       end
 
