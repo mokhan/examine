@@ -1,5 +1,5 @@
 FROM docker:stable
-RUN apk add ruby git
+RUN apk add ruby git curl
 RUN gem install bundler -v '~> 2.0' --no-document
 RUN mkdir -p /examine
 WORKDIR /examine
