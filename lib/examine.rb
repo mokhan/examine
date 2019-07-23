@@ -1,5 +1,6 @@
 require "examine/version"
 
+require 'socket'
 require 'thor'
 
 module Examine
@@ -19,11 +20,13 @@ module Examine
         puts "clair-local-scan started. (PID: #{clair_pid})"
       end
 
+      method_option :ip, desc: 'ip address', default: nil, type: :string
       desc 'scan <image>', 'scan a specific image'
       def scan(image)
+        ip = options[:ip] || Socket.ip_address_list[1].ip_address
         system "docker pull #{image}"
         system "echo clair-scanner -c http://localhost:6060 --ip $(hostname -i) #{image}"
-        system "clair-scanner -c http://localhost:6060 --ip 0.0.0.0 #{image}"
+        system "clair-scanner -c http://localhost:6060 --ip #{ip} #{image}"
       end
 
       desc 'status', 'status of clair server'
