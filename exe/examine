@@ -1,3 +1,5 @@
 #!/usr/bin/env ruby
 
 require "examine"
+
+Examine::CLI::Application.start(ARGV)
