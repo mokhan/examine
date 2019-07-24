@@ -27,7 +27,7 @@ rspec:
   script:
     - cd /examine/ && bundle exec rspec
 
-examine:
+container_scanning:
   image:
     name: docker:stable
   allow_failure: true
@@ -43,4 +43,7 @@ examine:
     - apk add ruby curl
     - gem install examine --no-document
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - examine clair scan $DOCKER_IMAGE --clair_url $CLAIR_URL --ip $(hostname -i)
+    - examine clair scan $DOCKER_IMAGE --clair_url $CLAIR_URL --ip $(hostname -i) --report gl-container-scanning-report.json
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
