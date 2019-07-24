@@ -69,12 +69,16 @@ module Examine
       end
 
       def clair_download_path
-        case RUBY_PLATFORM
-        when 'x86_64-linux'
-          URI.join(DOWNLOAD_PATH, 'clair-scanner_linux_386').to_s
-        else
-          raise 'clair-scanner could not be found in your PATH. Download from https://github.com/arminc/clair-scanner/releases'
-        end
+        platform = Gem::Platform.local
+        exe = {
+          'x86-darwin' => 'clair-scanner_darwin_386',
+          'x86-linux' => 'clair-scanner_linux_386',
+          'x86_64-darwin' => 'clair-scanner_darwin_amd64',
+          'x86_64-linux' => 'clair-scanner_linux_amd64',
+        }["#{platform.cpu}-#{platform.os}"]
+        return URI.join(DOWNLOAD_PATH, exe).to_s if exe
+
+        raise 'clair-scanner could not be found in your PATH. Download from https://github.com/arminc/clair-scanner/releases'
       end
     end
 
