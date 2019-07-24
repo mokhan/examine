@@ -30,10 +30,12 @@ rspec:
 examine:
   image:
     name: docker:stable
+  allow_failure: true
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
     GIT_STRATEGY: none
+    CLAIR_URL: http://docker:6000
   stage: test
   script:
-    - docker run -v /var/run/docker.sock:/var/run/docker.sock $DOCKER_IMAGE clair scan mokhan/minbox:latest
+    - docker run -v /var/run/docker.sock:/var/run/docker.sock $DOCKER_IMAGE clair scan mokhan/minbox:latest --clair_url $CLAIR_URL --ip $(hostname -i)
