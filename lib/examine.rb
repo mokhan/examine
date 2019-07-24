@@ -41,7 +41,7 @@ module Examine
           when 'x86_64-linux'
             URI.join(DOWNLOAD_PATH, 'clair-scanner_linux_386').to_s
           else
-            raise 'clair-scanner could not be found in your PATH.Download from https://github.com/arminc/clair-scanner/releases'
+            raise 'clair-scanner could not be found in your PATH. Download from https://github.com/arminc/clair-scanner/releases'
           end
           clair_exe = File.join(Dir.tmpdir, 'clair-scanner')
           Down.download(download_path, destination: clair_exe)
