@@ -29,12 +29,11 @@ rspec:
 
 examine:
   image:
-    name: $DOCKER_IMAGE
-    entrypoint: [""]
+    name: docker:stable
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://localhost:2375
     DOCKER_DRIVER: overlay2
     GIT_STRATEGY: none
   stage: test
   script:
-    - bundle exec ./examine clair scan mokhan/minbox:latest
+    - docker run -v /var/run/docker.sock:/var/run/docker.sock $DOCKER_IMAGE clair scan mokhan/minbox:latest
