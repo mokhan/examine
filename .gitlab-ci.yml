@@ -32,10 +32,11 @@ examine:
     name: docker:stable
   allow_failure: true
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    GIT_STRATEGY: none
     CLAIR_URL: http://docker:6000
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    GIT_STRATEGY: none
+    NO_PROXY: docker,localhost
   stage: test
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
