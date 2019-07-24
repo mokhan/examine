@@ -88,8 +88,7 @@ module Examine
       end
 
       def wait_until(command)
-        puts command
-        Timeout.timeout(60) do
+        Timeout.timeout(60, nil, command) do
           wait until system(command)
         end
       end
