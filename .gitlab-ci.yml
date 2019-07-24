@@ -32,7 +32,7 @@ examine:
     name: docker:stable
   allow_failure: true
   variables:
-    CLAIR_URL: http://docker:6000
+    CLAIR_URL: http://docker:6060
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
     GIT_STRATEGY: none
