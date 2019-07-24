@@ -15,11 +15,11 @@ module Examine
       desc 'start', 'start a clair server'
       def start
         spawn 'docker run -d --name clair-db arminc/clair-db:latest'
-        wait until system('docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT')
+        wait_until('docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT')
 
         spawn 'docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:latest'
-        wait until system('docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT')
-        wait until system("curl -s #{options[:clair_url]}/v1/namespaces > /dev/null")
+        wait_until('docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT')
+        wait_until("curl -s #{options[:clair_url]}/v1/namespaces > /dev/null")
       end
 
       method_option :ip, desc: 'ip address', default: nil, type: :string
@@ -84,6 +84,10 @@ module Examine
       def wait
         print '.'
         sleep 1
+      end
+
+      def wait_until(command)
+        wait until system(command)
       end
     end
 
