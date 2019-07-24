@@ -1,41 +1,40 @@
 services:
-  - docker:stable-dind
+  - docker:dind
 
 stages:
   - build
   - test
 
-include:
-  - template: Container-Scanning.gitlab-ci.yml
+variables:
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
 
 build:
   image: docker:stable
   stage: build
-  variables:
-    IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
   script:
     - docker info
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $IMAGE .
-    - docker push $IMAGE
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
 
 rspec:
   image:
-    name: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+    name: $DOCKER_IMAGE
     entrypoint: [""]
   variables:
     GIT_STRATEGY: none
   stage: test
   script:
     - pwd
-    - ls -alh
     - ls -alh /
-    - bundle exec rspec
+    - cd /examine/ && bundle exec rspec
 
 examine:
   image:
-    name: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+    name: $DOCKER_IMAGE
   variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
     GIT_STRATEGY: none
   stage: test
   script:
