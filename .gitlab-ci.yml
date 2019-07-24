@@ -37,24 +37,11 @@ examine:
     DOCKER_HOST: tcp://docker:2375
     GIT_STRATEGY: none
     NO_PROXY: docker,localhost
-  stage: test
-  script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker run -v /var/run/docker.sock:/var/run/docker.sock $DOCKER_IMAGE clair scan mokhan/minbox:latest --clair_url $CLAIR_URL --ip $(hostname -i)
-
-examine-it:
-  image:
-    name: docker:stable
-  allow_failure: true
-  variables:
-    CLAIR_URL: http://docker:6060
-    DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://docker:2375
-    GIT_STRATEGY: none
-    NO_PROXY: docker,localhost
+    TARGET_IMAGE: $DOCKER_IMAGE
   stage: test
   script:
     - apk add ruby curl
     - gem install bundler -v '~> 2.0' --no-document
     - gem install examine --no-document
-    - examine clair scan mokhan/minbox:latest --clair_url $CLAIR_URL --ip $(hostname -i)
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - examine clair scan $DOCKER_IMAGE --clair_url $CLAIR_URL --ip $(hostname -i)
