@@ -1,5 +1,7 @@
 require "examine/version"
 
+require 'down'
+require 'mkmf'
 require 'socket'
 require 'thor'
 
@@ -8,6 +10,7 @@ module Examine
 
   module CLI
     class Clair < Thor
+      DOWNLOAD_PATH = 'https://github.com/arminc/clair-scanner/releases/download/v12/'
 
       method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
       desc 'start', 'start a clair server'
@@ -33,8 +36,18 @@ module Examine
 
         ip = options[:ip] || Socket.ip_address_list[1].ip_address
         system "docker pull #{image}"
-        # TODO:: ensure that the clair-scanner is found in PATH
-        system "clair-scanner -c #{options[:clair_url]} --ip #{ip} #{image}"
+        unless (clair_exe = find_executable('clair-scanner'))
+          download_path = case RUBY_PLATFORM
+          when 'x86_64-linux'
+            URI.join(DOWNLOAD_PATH, 'clair-scanner_linux_386').to_s
+          else
+            raise 'clair-scanner could not be found in your PATH.Download from https://github.com/arminc/clair-scanner/releases'
+          end
+          clair_exe = File.join(Dir.tmpdir, 'clair-scanner')
+          Down.download(download_path, destination: clair_exe)
+          `chmod +x #{clair_exe}`
+        end
+        system "#{clair_exe} -c #{options[:clair_url]} --ip #{ip} #{image}"
       end
 
       desc 'status', 'status of clair server'
