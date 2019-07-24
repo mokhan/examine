@@ -40,5 +40,4 @@ examine:
   stage: test
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker pull $DOCKER_IMAGE
     - docker run -v /var/run/docker.sock:/var/run/docker.sock $DOCKER_IMAGE clair scan mokhan/minbox:latest --clair_url $CLAIR_URL --ip $(hostname -i)
