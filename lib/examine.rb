@@ -15,6 +15,7 @@ module Examine
       method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
       desc 'start', 'start a clair server'
       def start
+        ensure_docker_installed!
         spawn 'docker run -d --name clair-db arminc/clair-db:latest'
         wait_until('docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT')
 
@@ -52,14 +53,14 @@ module Examine
       end
 
       def clair_exe
-        @clair_exe ||= find_executable('clair-scanner') || download_clair
+        @clair_exe ||= executable_exists?('clair-scanner') || download_clair
       end
 
-      def find_executable(exe)
+      def executable_exists?(exe)
         found = ENV['PATH'].split(':').find do |x|
           File.exist?(File.join(x, exe))
         end
-        found ? File.join(found, exe) : found
+        return File.join(found, exe) if found
       end
 
       def download_clair
@@ -91,6 +92,10 @@ module Examine
         Timeout.timeout(60, nil, command) do
           wait until system(command)
         end
+      end
+
+      def ensure_docker_installed!
+        raise 'docker was not detected on the system' unless executable_exists?('docker')
       end
     end
 
