@@ -27,6 +27,8 @@ rspec:
     GIT_STRATEGY: none
   stage: test
   script:
+    - pwd
+    - ls -alh
     - bundle exec rspec
 
 examine:
