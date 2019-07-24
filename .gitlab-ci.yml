@@ -29,6 +29,7 @@ rspec:
   script:
     - pwd
     - ls -alh
+    - ls -alh /
     - bundle exec rspec
 
 examine:
