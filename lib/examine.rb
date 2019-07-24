@@ -87,6 +87,7 @@ module Examine
       end
 
       def wait_until(command)
+        puts command
         wait until system(command)
       end
     end
