@@ -25,17 +25,16 @@ rspec:
     GIT_STRATEGY: none
   stage: test
   script:
-    - pwd
-    - ls -alh /
     - cd /examine/ && bundle exec rspec
 
 examine:
   image:
     name: $DOCKER_IMAGE
+    entrypoint: [""]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
     GIT_STRATEGY: none
   stage: test
   script:
-    - clair scan mokhan/minbox:latest
+    - bundle exec ./examine clair scan mokhan/minbox:latest
