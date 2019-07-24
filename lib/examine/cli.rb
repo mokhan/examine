@@ -1,4 +1,3 @@
-
 require 'down'
 require 'socket'
 require 'thor'

@@ -17,13 +17,25 @@ module Examine
 
       method_option :ip, desc: 'ip address', default: nil, type: :string
       method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
+      method_option :report, desc: 'report file', default: 'report.json', type: :string
+      method_option :log, desc: 'log file', default: 'clair.log', type: :string
+      method_option :whitelist, desc: 'whitelist file', default: nil, type: :string
       desc 'scan <image>', 'scan a specific image'
       def scan(image)
         start unless started?
 
         ip = options[:ip] || Socket.ip_address_list[1].ip_address
         system "docker pull #{image}"
-        system "#{clair_exe} -c #{options[:clair_url]} --ip #{ip} #{image}"
+        command = [
+          clair_exe,
+          "-c #{options[:clair_url]}",
+          "--ip #{ip}",
+          "-r #{options[:report]}",
+          "-l #{options[:log]}",
+          image,
+        ]
+        command.insert(-2, "-w #{options[:whitelist]}") if options[:whitelist]
+        system command.join(' ')
       end
 
       desc 'status', 'status of clair server'
