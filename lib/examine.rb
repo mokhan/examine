@@ -3,6 +3,7 @@ require "examine/version"
 require 'down'
 require 'socket'
 require 'thor'
+require 'timeout'
 
 module Examine
   class Error < StandardError; end
@@ -88,7 +89,9 @@ module Examine
 
       def wait_until(command)
         puts command
-        wait until system(command)
+        Timeout.timeout(60) do
+          wait until system(command)
+        end
       end
     end
 
