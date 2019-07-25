@@ -2,7 +2,7 @@ module Examine
   module CLI
     class Clair < Thor
       DOWNLOAD_PATH = 'https://github.com/arminc/clair-scanner/releases/download/'
-      DOWNLOADS = {
+      EXECUTABLES = {
         'x86-darwin' => 'clair-scanner_darwin_386',
         'x86-linux' => 'clair-scanner_linux_386',
         'x86_64-darwin' => 'clair-scanner_darwin_amd64',
@@ -16,12 +16,12 @@ module Examine
       desc 'start', 'start a clair server'
       def start
         ensure_docker_installed!
-        spawn 'docker run -d --name clair-db arminc/clair-db:latest'
-        wait_until('docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT')
+        spawn clair_db
+        wait_until clair_db_running?
 
-        spawn "docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:#{options[:local_scan_version]}"
-        wait_until('docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT')
-        wait_until("curl -s #{options[:url]}/v1/namespaces > /dev/null")
+        spawn clair_local_scan(options[:local_scan_version])
+        wait_until clair_local_scan_running?
+        wait_until clair_local_scan_api_reachable?
       end
 
       method_option :ip, desc: 'ip address', default: nil, type: :string
@@ -81,7 +81,7 @@ module Examine
       end
 
       def clair_download_url
-        exe = DOWNLOADS["#{Gem::Platform.local.cpu}-#{Gem::Platform.local.os}"]
+        exe = EXECUTABLES["#{Gem::Platform.local.cpu}-#{Gem::Platform.local.os}"]
         return File.join(DOWNLOAD_PATH, options[:scanner_version], exe) if exe
 
         raise 'clair-scanner could not be found in your PATH. Download from https://github.com/arminc/clair-scanner/releases'
@@ -100,6 +100,26 @@ module Examine
 
       def ensure_docker_installed!
         raise 'docker was not detected on the system' unless executable_exists?('docker')
+      end
+
+      def clair_db_running?
+        'docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT'
+      end
+
+      def clair_db
+        'docker run -d --name clair-db arminc/clair-db:latest'
+      end
+
+      def clair_local_scan(version)
+        "docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:#{version}"
+      end
+
+      def clair_local_scan_running?
+        'docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT'
+      end
+
+      def clair_local_scan_api_reachable?(url = options[:url])
+        "curl -s #{url}/v1/namespaces > /dev/null"
       end
     end
   end
