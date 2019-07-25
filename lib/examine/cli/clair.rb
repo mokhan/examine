@@ -2,9 +2,9 @@ module Examine
   module CLI
     class Clair < Thor
       DOWNLOAD_PATH = 'https://github.com/arminc/clair-scanner/releases/download/v12/'
+      class_option :clair_local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
+      class_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
 
-      method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
-      method_option :clair_local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
       desc 'start', 'start a clair server'
       def start
         ensure_docker_installed!
@@ -17,7 +17,6 @@ module Examine
       end
 
       method_option :ip, desc: 'ip address', default: nil, type: :string
-      method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
       method_option :report, desc: 'report file', default: 'report.json', type: :string
       method_option :log, desc: 'log file', default: 'clair.log', type: :string
       method_option :whitelist, desc: 'whitelist file', default: nil, type: :string
