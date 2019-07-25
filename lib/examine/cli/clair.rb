@@ -4,13 +4,14 @@ module Examine
       DOWNLOAD_PATH = 'https://github.com/arminc/clair-scanner/releases/download/v12/'
 
       method_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
+      method_option :clair_local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
       desc 'start', 'start a clair server'
       def start
         ensure_docker_installed!
         spawn 'docker run -d --name clair-db arminc/clair-db:latest'
         wait_until('docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT')
 
-        spawn 'docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:latest'
+        spawn "docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:#{options[:clair_local_scan_version]}"
         wait_until('docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT')
         wait_until("curl -s #{options[:clair_url]}/v1/namespaces > /dev/null")
       end
