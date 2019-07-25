@@ -1,0 +1,30 @@
+require:
+  - rubocop/cop/internal_affairs
+  - rubocop-rspec
+AllCops:
+  Exclude:
+    - 'coverage/**/*'
+    - 'pkg/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+  TargetRubyVersion: 2.5
+
+Layout/IndentFirstArrayElement:
+  EnforcedStyle: consistent
+
+Metrics/BlockLength:
+  Exclude:
+    - '*.gemspec'
+    - 'spec/**/*.rb'
+
+Metrics/LineLength:
+  Exclude:
+    - 'spec/**/*.rb'
+  IgnoredPatterns:
+    - '^#*'
+
+Naming/RescuedExceptionsVariableName:
+  PreferredName: error
+
+RSpec/NamedSubject:
+  Enabled: false

@@ -1,12 +1,15 @@
+# frozen_string_literal: true
+
 module Examine
   module CLI
+    # Entrypoint into the `examine clair` subcommand.
     class Clair < Thor
       DOWNLOAD_PATH = 'https://github.com/arminc/clair-scanner/releases/download/'
       EXECUTABLES = {
         'x86-darwin' => 'clair-scanner_darwin_386',
         'x86-linux' => 'clair-scanner_linux_386',
         'x86_64-darwin' => 'clair-scanner_darwin_amd64',
-        'x86_64-linux' => 'clair-scanner_linux_amd64',
+        'x86_64-linux' => 'clair-scanner_linux_amd64'
       }.freeze
 
       class_option :local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
@@ -16,6 +19,8 @@ module Examine
       desc 'start', 'start a clair server'
       def start
         ensure_docker_installed!
+        return unless started?
+
         spawn clair_db
         wait_until clair_db_running?
 
@@ -28,32 +33,23 @@ module Examine
       method_option :report, desc: 'report file', default: 'report.json', type: :string
       method_option :log, desc: 'log file', default: 'clair.log', type: :string
       method_option :whitelist, desc: 'whitelist file', default: nil, type: :string
-      desc 'scan <image>', 'scan a specific image'
+      desc 'scan <image>', 'scan a specific docker image. E.g mokhan/minbox:latest'
       def scan(image)
-        start unless started?
+        start
 
         system "docker pull #{image}"
-        command = [
-          clair_exe,
-          "-c #{options[:url]}",
-          "--ip #{options[:ip] || Socket.ip_address_list[1].ip_address}",
-          "-r #{options[:report]}",
-          "-l #{options[:log]}",
-          image,
-        ]
-        command.insert(-2, "-w #{options[:whitelist]}") if options[:whitelist]
-        system command.join(' ')
+        system scan_command_for(image, options)
       end
 
       desc 'status', 'status of clair server'
       def status
-        system "docker ps -a | grep clair"
+        system 'docker ps -a | grep clair'
       end
 
       desc 'stop', 'stop all clair servers'
       def stop
         system "docker stop $(docker ps | grep -v CONT | grep clair- | awk '{ print $1 }')"
-        system "docker system prune -f"
+        system 'docker system prune -f'
       end
 
       private
@@ -66,10 +62,22 @@ module Examine
         @clair_exe ||= executable_exists?('clair-scanner') || download_clair
       end
 
+      def scan_command_for(image, options)
+        command = [
+          clair_exe, "-c #{options[:url]}",
+          "--ip #{clair_ip}",
+          "-r #{options[:report]}", "-l #{options[:log]}", image
+        ]
+        command.insert(-2, "-w #{options[:whitelist]}") if options[:whitelist]
+        command.join(' ')
+      end
+
+      def clair_ip
+        options[:ip] || Socket.ip_address_list[1].ip_address
+      end
+
       def executable_exists?(exe)
-        ENV['PATH'].split(':').map { |x| File.join(x, exe) }.find do |x|
-          File.exist?(x)
-        end
+        ENV['PATH'].split(':').map { |x| File.join(x, exe) }.find { |x| File.exist?(x) }
       end
 
       def download_clair

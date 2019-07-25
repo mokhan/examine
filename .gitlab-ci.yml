@@ -25,7 +25,17 @@ rspec:
     GIT_STRATEGY: none
   stage: test
   script:
-    - cd /examine/ && bundle exec rspec
+    - cd /examine/ && ./bin/test
+
+lint:
+  image:
+    name: $DOCKER_IMAGE
+    entrypoint: [""]
+  variables:
+    GIT_STRATEGY: none
+  stage: test
+  script:
+    - cd /examine/ && ./bin/lint
 
 container_scanning:
   image:

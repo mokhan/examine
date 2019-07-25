@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# script/test: Run test suite for application. Optionally pass in a path to an
+#              individual test file to run a single test.
+
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+[ -z "$DEBUG" ] || set -x
+
+# GC customizations
+export RUBY_GC_MALLOC_LIMIT=79000000
+export RUBY_GC_HEAP_INIT_SLOTS=800000
+export RUBY_HEAP_FREE_MIN=100000
+export RUBY_HEAP_SLOTS_INCREMENT=400000
+export RUBY_HEAP_SLOTS_GROWTH_FACTOR=1
+
+echo ["$(date "+%H:%M:%S")"] "==> Running setup…"
+bin/setup
+
+echo ["$(date "+%H:%M:%S")"] "==> Running tests…"
+if [[ $# -eq 0 ]]; then
+  bundle exec rake spec
+else
+  bundle exec rspec "$1"
+fi

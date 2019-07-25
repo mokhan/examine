@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module Examine
   module CLI
+    # Entrypoint to the CLI.
     class Application < Thor
       package_name 'examine'
 
