@@ -9,6 +9,6 @@ RSpec::Core::RakeTask.new(:spec)
 RuboCop::RakeTask.new(:rubocop)
 Bundler::Audit::Task.new
 
-desc "run linters"
+desc 'run linters'
 task lint: [:rubocop, 'bundle:audit']
 task default: :spec
