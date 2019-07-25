@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Examine your software.}
   spec.description   = %q{Examine your software.}
-  spec.homepage      = "https://www.mokhan.ca/"
+  spec.homepage      = "https://gitlab.com/xlgmokha/examine/"
   spec.license       = "MIT"
 
   # Specify which files should be added to the gem when it is released.
