@@ -2,9 +2,9 @@ module Examine
   module CLI
     class Clair < Thor
       DOWNLOAD_PATH = 'https://github.com/arminc/clair-scanner/releases/download/'
-      class_option :clair_local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
-      class_option :clair_scanner_version, desc: 'Version of the clair-scanner', default: 'v12', type: :string
-      class_option :clair_url, desc: 'clair url', default: 'http://localhost:6060', type: :string
+      class_option :local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
+      class_option :scanner_version, desc: 'Version of the clair-scanner', default: 'v12', type: :string
+      class_option :url, desc: 'clair url', default: 'http://localhost:6060', type: :string
 
       desc 'start', 'start a clair server'
       def start
@@ -12,9 +12,9 @@ module Examine
         spawn 'docker run -d --name clair-db arminc/clair-db:latest'
         wait_until('docker ps --filter="name=clair-db" --filter="status=running" --filter="expose=5432/tcp" | grep -v CONT')
 
-        spawn "docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:#{options[:clair_local_scan_version]}"
+        spawn "docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:#{options[:local_scan_version]}"
         wait_until('docker ps --filter="name=clair" --filter="status=running" --filter="expose=6060/tcp" | grep -v CONT')
-        wait_until("curl -s #{options[:clair_url]}/v1/namespaces > /dev/null")
+        wait_until("curl -s #{options[:url]}/v1/namespaces > /dev/null")
       end
 
       method_option :ip, desc: 'ip address', default: nil, type: :string
@@ -29,7 +29,7 @@ module Examine
         system "docker pull #{image}"
         command = [
           clair_exe,
-          "-c #{options[:clair_url]}",
+          "-c #{options[:url]}",
           "--ip #{ip}",
           "-r #{options[:report]}",
           "-l #{options[:log]}",
@@ -61,10 +61,9 @@ module Examine
       end
 
       def executable_exists?(exe)
-        found = ENV['PATH'].split(':').find do |x|
-          File.exist?(File.join(x, exe))
+        ENV['PATH'].split(':').map { |x| File.join(x, exe) }.find do |x|
+          File.exist?(x)
         end
-        return File.join(found, exe) if found
       end
 
       def download_clair
@@ -82,7 +81,7 @@ module Examine
           'x86_64-darwin' => 'clair-scanner_darwin_amd64',
           'x86_64-linux' => 'clair-scanner_linux_amd64',
         }["#{platform.cpu}-#{platform.os}"]
-        return File.join(DOWNLOAD_PATH, options[:clair_scanner_version], exe) if exe
+        return File.join(DOWNLOAD_PATH, options[:scanner_version], exe) if exe
 
         raise 'clair-scanner could not be found in your PATH. Download from https://github.com/arminc/clair-scanner/releases'
       end
