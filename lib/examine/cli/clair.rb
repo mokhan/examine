@@ -19,7 +19,7 @@ module Examine
       desc 'start', 'start a clair server'
       def start
         ensure_docker_installed!
-        return unless started?
+        return if started?
 
         spawn clair_db
         wait_until clair_db_running?
