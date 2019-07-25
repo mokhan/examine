@@ -32,12 +32,11 @@ module Examine
       def scan(image)
         start unless started?
 
-        ip = options[:ip] || Socket.ip_address_list[1].ip_address
         system "docker pull #{image}"
         command = [
           clair_exe,
           "-c #{options[:url]}",
-          "--ip #{ip}",
+          "--ip #{options[:ip] || Socket.ip_address_list[1].ip_address}",
           "-r #{options[:report]}",
           "-l #{options[:log]}",
           image,
