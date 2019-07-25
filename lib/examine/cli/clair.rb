@@ -2,6 +2,13 @@ module Examine
   module CLI
     class Clair < Thor
       DOWNLOAD_PATH = 'https://github.com/arminc/clair-scanner/releases/download/'
+      DOWNLOADS = {
+        'x86-darwin' => 'clair-scanner_darwin_386',
+        'x86-linux' => 'clair-scanner_linux_386',
+        'x86_64-darwin' => 'clair-scanner_darwin_amd64',
+        'x86_64-linux' => 'clair-scanner_linux_amd64',
+      }.freeze
+
       class_option :local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
       class_option :scanner_version, desc: 'Version of the clair-scanner', default: 'v12', type: :string
       class_option :url, desc: 'clair url', default: 'http://localhost:6060', type: :string
@@ -74,13 +81,7 @@ module Examine
       end
 
       def clair_download_url
-        platform = Gem::Platform.local
-        exe = {
-          'x86-darwin' => 'clair-scanner_darwin_386',
-          'x86-linux' => 'clair-scanner_linux_386',
-          'x86_64-darwin' => 'clair-scanner_darwin_amd64',
-          'x86_64-linux' => 'clair-scanner_linux_amd64',
-        }["#{platform.cpu}-#{platform.os}"]
+        exe = DOWNLOADS["#{Gem::Platform.local.cpu}-#{Gem::Platform.local.os}"]
         return File.join(DOWNLOAD_PATH, options[:scanner_version], exe) if exe
 
         raise 'clair-scanner could not be found in your PATH. Download from https://github.com/arminc/clair-scanner/releases'
