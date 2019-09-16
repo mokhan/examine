@@ -1,6 +1,9 @@
 services:
   - docker:dind
 
+include:
+  template: License-Management.gitlab-ci.yml
+
 stages:
   - build
   - test
