@@ -65,6 +65,8 @@ module Examine
         command = [
           clair_exe, "-c #{options[:url]}",
           "--ip #{clair_ip}",
+          '--threshold Low',
+          '--reportAll=false',
           "-r #{options[:report]}", "-l #{options[:log]}", image
         ]
         command.insert(-2, "-w #{options[:whitelist]}") if options[:whitelist]
@@ -117,7 +119,7 @@ module Examine
       end
 
       def clair_local_scan
-        "docker run --restart=unless-stopped -p 6060:6060 --add-host=postgres:0.0.0.0 --network=host -d --name clair arminc/clair-local-scan:latest"
+        'docker run --restart=unless-stopped -p 6060:6060 --add-host=postgres:0.0.0.0 --network=host -d --name clair arminc/clair-local-scan:latest'
       end
 
       def clair_local_scan_running?
