@@ -12,7 +12,6 @@ module Examine
         'x86_64-linux' => 'clair-scanner_linux_amd64'
       }.freeze
 
-      class_option :local_scan_version, desc: 'Version of the arminc/clair-local-scan image', default: 'latest', type: :string
       class_option :scanner_version, desc: 'Version of the clair-scanner', default: 'v12', type: :string
       class_option :url, desc: 'clair url', default: 'http://localhost:6060', type: :string
 
@@ -24,7 +23,7 @@ module Examine
         spawn clair_db
         wait_until clair_db_running?
 
-        spawn clair_local_scan(options[:local_scan_version])
+        spawn clair_local_scan
         wait_until clair_local_scan_running?
         wait_until clair_local_scan_api_reachable?
       end
@@ -114,11 +113,11 @@ module Examine
       end
 
       def clair_db
-        'docker run -d --name clair-db arminc/clair-db:latest'
+        'docker run -d --name clair-db --network=host arminc/clair-db:latest'
       end
 
-      def clair_local_scan(version)
-        "docker run --restart=unless-stopped -p 6060:6060 --link clair-db:postgres -d --name clair arminc/clair-local-scan:#{version}"
+      def clair_local_scan
+        "docker run --restart=unless-stopped -p 6060:6060 --add-host=postgres:0.0.0.0 --network=host -d --name clair arminc/clair-local-scan:latest"
       end
 
       def clair_local_scan_running?
