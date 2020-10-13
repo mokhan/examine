@@ -65,7 +65,7 @@ module Examine
         command = [
           clair_exe, "-c #{options[:url]}",
           "--ip #{clair_ip}",
-          '--threshold Low',
+          '--threshold High',
           '--reportAll=false',
           "-r #{options[:report]}", "-l #{options[:log]}", image
         ]
